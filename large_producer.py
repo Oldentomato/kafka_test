@@ -12,6 +12,13 @@ bootstrap_servers = 'localhost:9092'
 csv_file = 'gt.csv'
 # Kafka Producer 개수
 num_producers = 100
+# 배치 크기 설정 (메시지 수)
+batch_size = 100000
+# 배치 지연 설정 (밀리초)
+batch_delay_ms = 50
+
+# 파티션5개로 했을 때 20초 정도 더 걸림
+# 배치 1만개로 했을 때 1분 정도 더 걸림(배치를 한 이유는 성능조정 및 부하분산을 위함이다)
 
 # Kafka Producer 생성 함수
 def create_producer():
@@ -22,6 +29,8 @@ def create_producer():
             retries=5,  # 메시지 전송 실패 시 최대 5번 재시도
             retry_backoff_ms=1000,  # 재시도 간격을 100ms로 설정
             bootstrap_servers=bootstrap_servers,
+            batch_size=batch_size,
+            linger_ms=batch_delay_ms,
             api_version=(0,11,5),
             value_serializer=lambda x:dumps(x).encode('utf-8')
             )
