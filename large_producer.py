@@ -40,6 +40,8 @@ def send_messages(producer, topic, data):
     for row in data:
         message = ','.join(row)
         producer.send(topic, message)
+    else:
+        producer.flush()
 
 # CSV 파일을 읽어서 데이터를 가져오는 함수
 def read_csv(file):

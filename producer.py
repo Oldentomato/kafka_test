@@ -4,7 +4,7 @@ import time
 import csv
 
 
-csv_file = 'gt.csv'
+csv_file = 'vehicle_history.csv'
 
 # 배치 크기 설정 (메시지 수)
 batch_size = 100
@@ -19,8 +19,8 @@ producer = KafkaProducer(
     bootstrap_servers=['localhost:9092'], #전달하고자 하는 카프카 브로커의 주소 리스트
     retries=5,  # 메시지 전송 실패 시 최대 5번 재시도
     retry_backoff_ms=1000,  # 재시도 간격을 100ms로 설정
-    batch_size=batch_size,
-    linger_ms=batch_delay_ms,
+    # batch_size=batch_size,
+    # linger_ms=batch_delay_ms,
     api_version=(0,11,5),
     value_serializer=lambda x:dumps(x).encode('utf-8') #메시지의 값 직렬화
 )
@@ -35,13 +35,14 @@ data = read_csv(csv_file)
 
 start = time.time()
 
-# for row in data:
-#     message = ','.join(row)
-#     producer.send('topic1', message)
-#     producer.flush()
-for i in range(1000):
-    data = {'str': f'result{i}'}
-    producer.send('topic1', value=data) #내부 버퍼에 쌓아두고
-    producer.flush() #broker에게 전달
+for row in data:
+    message = ','.join(row)
+    producer.send('origin', message)
 
+# for i in range(1000):
+#     data = {'str': f'result{i}'}
+#     producer.send('topic1', value=data) #내부 버퍼에 쌓아두고
+#     producer.flush() #broker에게 전달
+producer.flush()
+producer.close()
 print(f'[Done]: {time.time()-start}')
